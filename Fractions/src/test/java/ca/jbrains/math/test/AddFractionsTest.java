@@ -8,8 +8,7 @@ public class AddFractionsTest {
     public void zeroPlusZero() throws Exception {
         final Fraction zero = new Fraction(0);
         final Fraction sum = zero.plus(zero);
-        Assert.assertEquals(0, sum.getNumerator());
-        Assert.assertEquals(1, sum.getDenominator());
+        Assert.assertEquals(new Fraction(0), sum);
     }
 
     @Test
@@ -17,36 +16,31 @@ public class AddFractionsTest {
         final Fraction zero = new Fraction(0);
         final Fraction four = new Fraction(4);
         final Fraction sum = four.plus(zero);
-        Assert.assertEquals(4, sum.getNumerator());
-        Assert.assertEquals(1, sum.getDenominator());
+        Assert.assertEquals(four, sum);
     }
 
     @Test
     public void zeroPlusNotZero() throws Exception {
         final Fraction sum = new Fraction(0).plus(new Fraction(7));
-        Assert.assertEquals(7, sum.getNumerator());
-        Assert.assertEquals(1, sum.getDenominator());
+        Assert.assertEquals(new Fraction(7), sum);
     }
 
     @Test
     public void notZeroPlusNotZeroAllIntegers() throws Exception {
         final Fraction sum = new Fraction(3).plus(new Fraction(9));
-        Assert.assertEquals(12, sum.getNumerator());
-        Assert.assertEquals(1, sum.getDenominator());
+        Assert.assertEquals(new Fraction(12), sum);
     }
 
     @Test
     public void notIntegersWithSameDenominator() throws Exception {
         final Fraction sum = new Fraction(1, 5).plus(new Fraction(2, 5));
-        Assert.assertEquals(3, sum.getNumerator());
-        Assert.assertEquals(5, sum.getDenominator());
+        Assert.assertEquals(new Fraction(3, 5), sum);
     }
 
     @Test
     public void denominatorsWithNoCommonFactors() throws Exception {
         final Fraction sum = new Fraction(3, 2).plus(new Fraction(4, 7));
-        Assert.assertEquals(29, sum.getNumerator());
-        Assert.assertEquals(14, sum.getDenominator());
+        Assert.assertEquals(new Fraction(29, 14), sum);
     }
 
     private static class Fraction {
@@ -77,6 +71,24 @@ public class AddFractionsTest {
 
         public int getDenominator() {
             return denominator;
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            if (other instanceof Fraction) {
+                Fraction that = (Fraction) other;
+                return this.numerator == that.numerator
+                        && this.denominator == that.denominator;
+            }
+            else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            // SMELL This makes it suck to use Fractions as keys in a dictionary.
+            return 762;
         }
     }
 }
