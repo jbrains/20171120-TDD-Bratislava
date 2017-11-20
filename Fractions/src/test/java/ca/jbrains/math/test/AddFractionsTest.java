@@ -26,7 +26,7 @@ public class AddFractionsTest {
     }
 
     @Test
-    public void notZeroPlusNotZero() throws Exception {
+    public void notZeroPlusNotZeroAllIntegers() throws Exception {
         final Fraction sum = new Fraction(3).plus(new Fraction(9));
         Assert.assertEquals(12, sum.intValue());
     }
