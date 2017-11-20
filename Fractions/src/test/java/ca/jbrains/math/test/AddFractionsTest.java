@@ -8,7 +8,8 @@ public class AddFractionsTest {
     public void zeroPlusZero() throws Exception {
         final Fraction zero = new Fraction(0);
         final Fraction sum = zero.plus(zero);
-        Assert.assertEquals(0, sum.intValue());
+        Assert.assertEquals(0, sum.getNumerator());
+        Assert.assertEquals(1, sum.getDenominator());
     }
 
     @Test
@@ -16,19 +17,22 @@ public class AddFractionsTest {
         final Fraction zero = new Fraction(0);
         final Fraction four = new Fraction(4);
         final Fraction sum = four.plus(zero);
-        Assert.assertEquals(4, sum.intValue());
+        Assert.assertEquals(4, sum.getNumerator());
+        Assert.assertEquals(1, sum.getDenominator());
     }
 
     @Test
     public void zeroPlusNotZero() throws Exception {
         final Fraction sum = new Fraction(0).plus(new Fraction(7));
-        Assert.assertEquals(7, sum.intValue());
+        Assert.assertEquals(7, sum.getNumerator());
+        Assert.assertEquals(1, sum.getDenominator());
     }
 
     @Test
     public void notZeroPlusNotZeroAllIntegers() throws Exception {
         final Fraction sum = new Fraction(3).plus(new Fraction(9));
-        Assert.assertEquals(12, sum.intValue());
+        Assert.assertEquals(12, sum.getNumerator());
+        Assert.assertEquals(1, sum.getDenominator());
     }
 
     @Test
@@ -41,28 +45,18 @@ public class AddFractionsTest {
     private static class Fraction {
         private int numerator;
         private int denominator;
-        private int intValue;
 
         public Fraction(final int intValue) {
             this(intValue, 1);
         }
 
         public Fraction(final int numerator, final int denominator) {
-            this.intValue = numerator;
             this.numerator = numerator;
             this.denominator = denominator;
         }
 
         public Fraction plus(final Fraction that) {
-            if (this.denominator == 1 && that.denominator == 1) {
-                return new Fraction(this.intValue + that.intValue);
-            } else {
-                return new Fraction(this.numerator + that.numerator, this.denominator);
-            }
-        }
-
-        public int intValue() {
-            return intValue;
+            return new Fraction(this.numerator + that.numerator, this.denominator);
         }
 
         public int getNumerator() {
