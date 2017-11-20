@@ -7,8 +7,9 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/resources" type="java-resource" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.8.0_112" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.0" level="project" />
   </component>
 </module>
