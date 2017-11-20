@@ -43,6 +43,13 @@ public class AddFractionsTest {
         Assert.assertEquals(new Fraction(29, 14), sum);
     }
 
+    @Test
+    public void unequalDenominatorsWithCommonFactors() throws Exception {
+        Assert.assertEquals(
+                new Fraction(19, 24),
+                new Fraction(3, 8).plus(new Fraction(5, 12)));
+    }
+
     private static class Fraction {
         private int numerator;
         private int denominator;
@@ -77,8 +84,7 @@ public class AddFractionsTest {
         public boolean equals(final Object other) {
             if (other instanceof Fraction) {
                 Fraction that = (Fraction) other;
-                return this.numerator == that.numerator
-                        && this.denominator == that.denominator;
+                return this.numerator * that.denominator == that.numerator * this.denominator;
             }
             else {
                 return false;
