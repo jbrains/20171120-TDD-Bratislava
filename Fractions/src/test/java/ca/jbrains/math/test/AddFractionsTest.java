@@ -50,7 +50,7 @@ public class AddFractionsTest {
                 new Fraction(3, 8).plus(new Fraction(5, 12)));
     }
 
-    private static class Fraction {
+    private static final class Fraction {
         private int numerator;
         private int denominator;
 
