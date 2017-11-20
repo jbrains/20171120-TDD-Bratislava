@@ -90,5 +90,10 @@ public class AddFractionsTest {
             // SMELL This makes it suck to use Fractions as keys in a dictionary.
             return 762;
         }
+
+        @Override
+        public String toString() {
+            return String.format("%d/%d", numerator, denominator);
+        }
     }
 }
