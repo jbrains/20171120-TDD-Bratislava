@@ -6,6 +6,7 @@ import org.junit.Test;
 public class SellOneItemControllerTest {
     private boolean displayPriceInvoked;
     private boolean displayProductNotFoundMessageInvoked;
+    private boolean displayEmptyBarcodeMessageInvoked;
 
     @Test
     public void productFound() throws Exception {
@@ -25,6 +26,11 @@ public class SellOneItemControllerTest {
 
             @Override
             public void displayProductNotFoundMessage(final String barcode) {
+                // I DON'T CARE
+            }
+
+            @Override
+            public void displayEmptyBarcodeMessage() {
                 // I DON'T CARE
             }
         };
@@ -54,11 +60,37 @@ public class SellOneItemControllerTest {
                 Assert.assertEquals(barcodeNotFound, barcode);
                 SellOneItemControllerTest.this.displayProductNotFoundMessageInvoked = true;
             }
+
+            @Override
+            public void displayEmptyBarcodeMessage() {
+                // I DON'T CARE
+            }
         };
 
         new Sale(catalog, display).onBarcode(barcodeNotFound);
 
         Assert.assertTrue(displayProductNotFoundMessageInvoked);
+    }
+
+    @Test
+    public void emptyBarcode() throws Exception {
+        Display display = new Display() {
+            @Override
+            public void displayPrice(final Price price) {
+                // I DON'T CARE
+            }
+
+            public void displayProductNotFoundMessage(String barcode) {
+            }
+
+            public void displayEmptyBarcodeMessage() {
+                SellOneItemControllerTest.this.displayEmptyBarcodeMessageInvoked = true;
+            }
+        };
+
+        new Sale(null, display).onBarcode("");
+
+        Assert.assertTrue(displayEmptyBarcodeMessageInvoked);
     }
 
     public interface Catalog {
@@ -69,6 +101,8 @@ public class SellOneItemControllerTest {
         void displayPrice(Price price);
 
         void displayProductNotFoundMessage(String barcode);
+
+        void displayEmptyBarcodeMessage();
     }
 
     public static class Sale {
@@ -81,6 +115,11 @@ public class SellOneItemControllerTest {
         }
 
         public void onBarcode(final String barcode) {
+            if ("".equals(barcode)) {
+                display.displayEmptyBarcodeMessage();
+                return;
+            }
+            
             final Price price = catalog.findPrice(barcode);
             if (price == null)
                 display.displayProductNotFoundMessage(barcode);
