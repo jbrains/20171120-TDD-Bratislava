@@ -16,7 +16,7 @@ public class SellOneItemControllerTest {
     @Test
     public void productFound() throws Exception {
         final Display display = context.mock(Display.class);
-        
+
         final Price matchingPrice = Price.euroCents(795);
         final Catalog catalog = (ignoredBarcode) -> matchingPrice;
 
@@ -29,55 +29,24 @@ public class SellOneItemControllerTest {
 
     @Test
     public void productNotFound() throws Exception {
-        Catalog catalog = new Catalog() {
-            public Price findPrice(String barcode) {
-                return null;
-            }
-        };
+        Catalog catalog = (ignoredBarcode) -> null;
 
-        final String barcodeNotFound = "::any barcode without a matching price::";
+        final Display display = context.mock(Display.class);
+        context.checking(new Expectations() {{
+            oneOf(display).displayProductNotFoundMessage(with("::any barcode without a matching price::"));
+        }});
 
-        Display display = new Display() {
-            @Override
-            public void displayPrice(final Price price) {
-                // I DON'T CARE
-            }
-
-            public void displayProductNotFoundMessage(String barcode) {
-                Assert.assertEquals(barcodeNotFound, barcode);
-                SellOneItemControllerTest.this.displayProductNotFoundMessageInvoked = true;
-            }
-
-            @Override
-            public void displayEmptyBarcodeMessage() {
-                // I DON'T CARE
-            }
-        };
-
-        new Sale(catalog, display).onBarcode(barcodeNotFound);
-
-        Assert.assertTrue(displayProductNotFoundMessageInvoked);
+        new Sale(catalog, display).onBarcode("::any barcode without a matching price::");
     }
 
     @Test
     public void emptyBarcode() throws Exception {
-        Display display = new Display() {
-            @Override
-            public void displayPrice(final Price price) {
-                // I DON'T CARE
-            }
-
-            public void displayProductNotFoundMessage(String barcode) {
-            }
-
-            public void displayEmptyBarcodeMessage() {
-                SellOneItemControllerTest.this.displayEmptyBarcodeMessageInvoked = true;
-            }
-        };
+        final Display display = context.mock(Display.class);
+        context.checking(new Expectations() {{
+            oneOf(display).displayEmptyBarcodeMessage();
+        }});
 
         new Sale(null, display).onBarcode("");
-
-        Assert.assertTrue(displayEmptyBarcodeMessageInvoked);
     }
 
     public interface Catalog {
