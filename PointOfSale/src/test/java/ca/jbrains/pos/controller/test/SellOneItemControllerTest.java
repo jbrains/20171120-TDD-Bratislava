@@ -1,43 +1,30 @@
 package ca.jbrains.pos.controller.test;
 
+import org.jmock.Expectations;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class SellOneItemControllerTest {
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
     private boolean displayPriceInvoked;
     private boolean displayProductNotFoundMessageInvoked;
     private boolean displayEmptyBarcodeMessageInvoked;
 
     @Test
     public void productFound() throws Exception {
+        final Display display = context.mock(Display.class);
+        
         final Price matchingPrice = Price.euroCents(795);
+        final Catalog catalog = (ignoredBarcode) -> matchingPrice;
 
-        Catalog catalog = new Catalog() {
-            public Price findPrice(String barcode) {
-                return matchingPrice;
-            }
-        };
-
-        Display display = new Display() {
-            public void displayPrice(Price price) {
-                Assert.assertEquals(matchingPrice, price);
-                SellOneItemControllerTest.this.displayPriceInvoked = true;
-            }
-
-            @Override
-            public void displayProductNotFoundMessage(final String barcode) {
-                // I DON'T CARE
-            }
-
-            @Override
-            public void displayEmptyBarcodeMessage() {
-                // I DON'T CARE
-            }
-        };
+        context.checking(new Expectations() {{
+            oneOf(display).displayPrice(with(matchingPrice));
+        }});
 
         new Sale(catalog, display).onBarcode("::any barcode::");
-
-        Assert.assertTrue(displayPriceInvoked);
     }
 
     @Test
@@ -119,7 +106,7 @@ public class SellOneItemControllerTest {
                 display.displayEmptyBarcodeMessage();
                 return;
             }
-            
+
             final Price price = catalog.findPrice(barcode);
             if (price == null)
                 display.displayProductNotFoundMessage(barcode);
