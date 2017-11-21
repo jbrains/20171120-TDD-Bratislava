@@ -68,10 +68,13 @@ public class SellOneItemTest {
         public void onBarcode(final String barcode) {
             if ("".equals(barcode))
                 display.displayEmptyBarcodeMessage();
-            else if (catalog.hasBarcode(barcode))
-                display.displayPrice(catalog.findPrice(barcode));
-            else
-                display.displayProductNotFoundMessage(barcode);
+            else {
+                final String price = catalog.findPrice(barcode);
+                if (price == null)
+                    display.displayProductNotFoundMessage(barcode);
+                else
+                    display.displayPrice(price);
+            }
         }
     }
 
@@ -100,10 +103,6 @@ public class SellOneItemTest {
 
         public Catalog(final Map<String, String> pricesByBarcode) {
             this.pricesByBarcode = pricesByBarcode;
-        }
-
-        public boolean hasBarcode(final String barcode) {
-            return this.pricesByBarcode.containsKey(barcode);
         }
 
         public String findPrice(final String barcode) {
