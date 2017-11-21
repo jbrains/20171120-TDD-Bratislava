@@ -66,15 +66,16 @@ public class SellOneItemTest {
         }
 
         public void onBarcode(final String barcode) {
-            if ("".equals(barcode))
+            if ("".equals(barcode)) {
                 display.displayEmptyBarcodeMessage();
-            else {
-                final String price = catalog.findPrice(barcode);
-                if (price == null)
-                    display.displayProductNotFoundMessage(barcode);
-                else
-                    display.displayPrice(price);
+                return;
             }
+
+            final String price = catalog.findPrice(barcode);
+            if (price == null)
+                display.displayProductNotFoundMessage(barcode);
+            else
+                display.displayPrice(price);
         }
     }
 
