@@ -67,12 +67,21 @@ public class SellOneItemTest {
 
         public void onBarcode(final String barcode) {
             if ("".equals(barcode))
-                display.setText("Scanning error: empty barcode");
-            else if (pricesByBarcode.containsKey(barcode))
-                display.setText(pricesByBarcode.get(barcode));
+                display.displayEmptyBarcodeMessage();
+            else if (hasBarcode(barcode))
+                display.displayPrice(findPrice(barcode));
             else
-                display.setText(String.format("Product not found for %s", barcode));
+                display.displayProductNotFoundMessage(barcode);
         }
+
+        private boolean hasBarcode(final String barcode) {
+            return pricesByBarcode.containsKey(barcode);
+        }
+
+        private String findPrice(final String barcode) {
+            return pricesByBarcode.get(barcode);
+        }
+
     }
 
     private static class Display {
@@ -84,6 +93,18 @@ public class SellOneItemTest {
 
         public void setText(final String text) {
             this.text = text;
+        }
+
+        private void displayEmptyBarcodeMessage() {
+            setText("Scanning error: empty barcode");
+        }
+
+        private void displayPrice(final String price) {
+            setText(price);
+        }
+
+        private void displayProductNotFoundMessage(final String barcode) {
+            setText(String.format("Product not found for %s", barcode));
         }
     }
 }
