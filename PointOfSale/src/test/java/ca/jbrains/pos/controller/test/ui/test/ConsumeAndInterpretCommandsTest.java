@@ -13,8 +13,6 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ConsumeAndInterpretCommandsTest {
     @Rule
@@ -57,8 +55,50 @@ public class ConsumeAndInterpretCommandsTest {
                 "::barcode 3::"))));
     }
 
+    @Test
+    public void someCommandsAreEmpty() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+        }});
+
+        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+                "",
+                "::barcode 1::",
+                "",
+                "",
+                "::barcode 2::",
+                "",
+                "",
+                "",
+                "::barcode 3::",
+                ""))));
+    }
+
+    @Test
+    @Ignore
+    public void manyCommandsWithSomeWhitespaceAllOverThePlace() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+        }});
+
+        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+                "      ",
+                "     ::barcode 1::",
+                "",
+                "::barcode 2::    ",
+                "",
+                "\t     \t ::barcode 3::\t\t",
+                "    \t\t    \u00a0  \t\t     "))));
+    }
+
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        new BufferedReader(reader).lines().forEach(barcodeScannedListener::onBarcode);
+        new BufferedReader(reader).lines().filter(
+                line -> !line.isEmpty()
+        ).forEach(barcodeScannedListener::onBarcode);
     }
 
     public interface BarcodeScannedListener {
