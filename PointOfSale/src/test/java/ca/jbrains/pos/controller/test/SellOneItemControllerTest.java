@@ -9,9 +9,6 @@ import org.junit.Test;
 public class SellOneItemControllerTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
-    private boolean displayPriceInvoked;
-    private boolean displayProductNotFoundMessageInvoked;
-    private boolean displayEmptyBarcodeMessageInvoked;
 
     @Test
     public void productFound() throws Exception {
