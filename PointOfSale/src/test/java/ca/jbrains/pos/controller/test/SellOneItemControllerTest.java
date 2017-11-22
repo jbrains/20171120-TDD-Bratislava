@@ -9,6 +9,7 @@ import org.junit.Test;
 public class SellOneItemControllerTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
+    
     private Display display;
 
     @Before
