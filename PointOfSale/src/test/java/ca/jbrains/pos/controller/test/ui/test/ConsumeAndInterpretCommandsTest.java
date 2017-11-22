@@ -95,15 +95,15 @@ public class ConsumeAndInterpretCommandsTest {
     }
 
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        interpretCommands(normalize(consume(reader)));
+        normalize(consumeTextAsLines(reader)).forEach(this::interpretCommand);
     }
 
-    // CONTRACT: commands are normalized
-    private void interpretCommands(final Stream<String> commands) {
-        commands.forEach(barcodeScannedListener::onBarcode);
+    // CONTRACT: the command text is "normalized"
+    private void interpretCommand(String text) {
+        barcodeScannedListener.onBarcode(text);
     }
 
-    private Stream<String> consume(final Reader reader) {
+    private Stream<String> consumeTextAsLines(final Reader reader) {
         return new BufferedReader(reader).lines();
     }
 
