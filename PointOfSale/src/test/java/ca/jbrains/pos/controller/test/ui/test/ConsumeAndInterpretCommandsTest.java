@@ -2,7 +2,6 @@ package ca.jbrains.pos.controller.test.ui.test;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -13,6 +12,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class ConsumeAndInterpretCommandsTest {
     @Rule
@@ -77,7 +77,6 @@ public class ConsumeAndInterpretCommandsTest {
     }
 
     @Test
-    @Ignore
     public void manyCommandsWithSomeWhitespaceAllOverThePlace() throws Exception {
         context.checking(new Expectations() {{
             oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
@@ -86,19 +85,34 @@ public class ConsumeAndInterpretCommandsTest {
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
-                "      ",
+                "   \r    \n   ",
                 "     ::barcode 1::",
                 "",
                 "::barcode 2::    ",
                 "",
                 "\t     \t ::barcode 3::\t\t",
-                "    \t\t    \u00a0  \t\t     "))));
+                "    \t\t      \t\t     "))));
     }
 
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        new BufferedReader(reader).lines().filter(
+        interpretCommands(normalize(consume(reader)));
+    }
+
+    // CONTRACT: commands are normalized
+    private void interpretCommands(final Stream<String> commands) {
+        commands.forEach(barcodeScannedListener::onBarcode);
+    }
+
+    private Stream<String> consume(final Reader reader) {
+        return new BufferedReader(reader).lines();
+    }
+
+    private Stream<String> normalize(final Stream<String> lines) {
+        return lines.map(
+                line -> line.trim()
+        ).filter(
                 line -> !line.isEmpty()
-        ).forEach(barcodeScannedListener::onBarcode);
+        );
     }
 
     public interface BarcodeScannedListener {
