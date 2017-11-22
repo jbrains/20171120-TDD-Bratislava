@@ -107,8 +107,4 @@ public class ConsumeAndInterpretCommandsTest {
     private Stream<String> normalize(final Stream<String> lines) {
         return NormalizeStreamsOfText.removeWhitespace(lines);
     }
-
-    public interface BarcodeScannedListener {
-        void onBarcode(String barcode);
-    }
 }
