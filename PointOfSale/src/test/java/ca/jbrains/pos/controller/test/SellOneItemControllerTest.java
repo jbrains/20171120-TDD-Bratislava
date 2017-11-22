@@ -3,20 +3,25 @@ package ca.jbrains.pos.controller.test;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class SellOneItemControllerTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
+    private Display display;
+
+    @Before
+    public void setUp() throws Exception {
+        display = context.mock(Display.class);
+    }
 
     @Test
     public void productFound() throws Exception {
-        final Display display = context.mock(Display.class);
-
         final Price matchingPrice = Price.euroCents(795);
-        final Catalog catalog = (ignoredBarcode) -> matchingPrice;
 
+        final Catalog catalog = (ignoredBarcode) -> matchingPrice;
         context.checking(new Expectations() {{
             oneOf(display).displayPrice(with(matchingPrice));
         }});
@@ -27,8 +32,6 @@ public class SellOneItemControllerTest {
     @Test
     public void productNotFound() throws Exception {
         Catalog catalog = (ignoredBarcode) -> null;
-
-        final Display display = context.mock(Display.class);
         context.checking(new Expectations() {{
             oneOf(display).displayProductNotFoundMessage(with("::any barcode without a matching price::"));
         }});
@@ -38,7 +41,6 @@ public class SellOneItemControllerTest {
 
     @Test
     public void emptyBarcode() throws Exception {
-        final Display display = context.mock(Display.class);
         context.checking(new Expectations() {{
             oneOf(display).displayEmptyBarcodeMessage();
         }});
