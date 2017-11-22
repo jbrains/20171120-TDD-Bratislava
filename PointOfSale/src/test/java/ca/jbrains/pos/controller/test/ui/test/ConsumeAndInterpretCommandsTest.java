@@ -2,6 +2,7 @@ package ca.jbrains.pos.controller.test.ui.test;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -9,13 +10,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConsumeAndInterpretCommandsTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
     private final BarcodeScannedListener barcodeScannedListener = context.mock(BarcodeScannedListener.class);
+
+    private static String unlines(final List<CharSequence> linesOfText) {
+        return String.join(System.lineSeparator(), linesOfText);
+    }
 
     @Test
     public void noCommands() throws Exception {
@@ -35,15 +43,22 @@ public class ConsumeAndInterpretCommandsTest {
         consumeAndInterpretCommands(new StringReader(unlines(Collections.singletonList("127638"))));
     }
 
-    private static String unlines(final List<CharSequence> linesOfText) {
-        return String.join(System.lineSeparator(), linesOfText);
+    @Test
+    public void manyCommands() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
+            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+        }});
+
+        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+                "::barcode 1::",
+                "::barcode 2::",
+                "::barcode 3::"))));
     }
 
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        final String theLine = new BufferedReader(reader).readLine();
-        if (theLine != null) {
-            barcodeScannedListener.onBarcode(theLine);
-        }
+        new BufferedReader(reader).lines().forEach(barcodeScannedListener::onBarcode);
     }
 
     public interface BarcodeScannedListener {
