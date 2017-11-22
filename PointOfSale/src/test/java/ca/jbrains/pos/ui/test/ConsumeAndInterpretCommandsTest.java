@@ -1,19 +1,16 @@
 package ca.jbrains.pos.ui.test;
 
+import ca.jbrains.pos.ui.ConsumeTextAsLines;
 import ca.jbrains.pos.ui.NormalizeStreamsOfText;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConsumeAndInterpretCommandsTest {
@@ -32,7 +29,8 @@ public class ConsumeAndInterpretCommandsTest {
             never(interpretCommand);
         }});
 
-        consumeAndInterpretCommands(new StringReader(unlines(Collections.emptyList())));
+        final Stream<String> lines = Collections.<String> emptyList().stream();
+        interpretLinesAsCommands(lines);
     }
 
     @Test
@@ -41,7 +39,8 @@ public class ConsumeAndInterpretCommandsTest {
             oneOf(interpretCommand).interpretCommand("127638");
         }});
 
-        consumeAndInterpretCommands(new StringReader(unlines(Collections.singletonList("127638"))));
+        final Stream<String> lines = Collections.singletonList("127638").stream();
+        interpretLinesAsCommands(lines);
     }
 
     @Test
@@ -52,10 +51,11 @@ public class ConsumeAndInterpretCommandsTest {
             oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
-        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+        final Stream<String> lines = Arrays.asList(
                 "::barcode 1::",
                 "::barcode 2::",
-                "::barcode 3::"))));
+                "::barcode 3::").stream();
+        interpretLinesAsCommands(lines);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ConsumeAndInterpretCommandsTest {
             oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
-        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+        final Stream<String> lines = Arrays.asList(
                 "",
                 "::barcode 1::",
                 "",
@@ -76,7 +76,8 @@ public class ConsumeAndInterpretCommandsTest {
                 "",
                 "",
                 "::barcode 3::",
-                ""))));
+                "").stream();
+        interpretLinesAsCommands(lines);
     }
 
     @Test
@@ -87,22 +88,20 @@ public class ConsumeAndInterpretCommandsTest {
             oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
-        consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
+        final Stream<String> lines = Arrays.asList(
                 "   \r    \n   ",
                 "     ::barcode 1::",
                 "",
                 "::barcode 2::    ",
                 "",
                 "\t     \t ::barcode 3::\t\t",
-                "    \t\t      \t\t     "))));
+                "    \t\t      \t\t     ").stream();
+
+        interpretLinesAsCommands(lines);
     }
 
-    private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        normalize(consumeTextAsLines(reader)).forEach(interpretCommand::interpretCommand);
-    }
-
-    private Stream<String> consumeTextAsLines(final Reader reader) {
-        return new BufferedReader(reader).lines();
+    private void interpretLinesAsCommands(final Stream<String> lines) {
+        normalize(lines).forEach(interpretCommand::interpretCommand);
     }
 
     private Stream<String> normalize(final Stream<String> lines) {
