@@ -84,9 +84,4 @@ public class SellOneItemControllerTest {
         }
     }
 
-    public static class Price {
-        public static Price euroCents(final int euroCents) {
-            return new Price();
-        }
-    }
 }
