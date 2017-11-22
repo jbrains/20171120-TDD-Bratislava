@@ -9,7 +9,7 @@ import org.junit.Test;
 public class SellOneItemControllerTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
-    
+
     private Display display;
 
     @Before
@@ -33,7 +33,8 @@ public class SellOneItemControllerTest {
     public void productNotFound() throws Exception {
         Catalog catalog = (ignoredBarcode) -> null;
         context.checking(new Expectations() {{
-            oneOf(display).displayProductNotFoundMessage(with("::any barcode without a matching price::"));
+            oneOf(display).displayProductNotFoundMessage(with(
+                    "::any barcode without a matching price::"));
         }});
 
         new Sale(catalog, display).onBarcode("::any barcode without a matching price::");
