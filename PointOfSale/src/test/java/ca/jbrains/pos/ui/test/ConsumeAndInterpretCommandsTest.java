@@ -13,14 +13,14 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
+public class ConsumeAndInterpretCommandsTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
-    private final BarcodeScannedListener barcodeScannedListener = context.mock(BarcodeScannedListener.class);
-    private final InterpretCommand interpretCommand = this;
+    private final InterpretCommand interpretCommand = context.mock(InterpretCommand.class);
 
     private static String unlines(final List<CharSequence> linesOfText) {
         return String.join(System.lineSeparator(), linesOfText);
@@ -29,7 +29,7 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Test
     public void noCommands() throws Exception {
         context.checking(new Expectations() {{
-            never(barcodeScannedListener);
+            never(interpretCommand);
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Collections.emptyList())));
@@ -38,7 +38,7 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Test
     public void oneCommand() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(barcodeScannedListener).onBarcode("127638");
+            oneOf(interpretCommand).interpretCommand("127638");
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Collections.singletonList("127638"))));
@@ -47,9 +47,9 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Test
     public void manyCommands() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+            oneOf(interpretCommand).interpretCommand("::barcode 1::");
+            oneOf(interpretCommand).interpretCommand("::barcode 2::");
+            oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
@@ -61,9 +61,9 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Test
     public void someCommandsAreEmpty() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+            oneOf(interpretCommand).interpretCommand("::barcode 1::");
+            oneOf(interpretCommand).interpretCommand("::barcode 2::");
+            oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
@@ -82,9 +82,9 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Test
     public void manyCommandsWithSomeWhitespaceAllOverThePlace() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(barcodeScannedListener).onBarcode("::barcode 1::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 2::");
-            oneOf(barcodeScannedListener).onBarcode("::barcode 3::");
+            oneOf(interpretCommand).interpretCommand("::barcode 1::");
+            oneOf(interpretCommand).interpretCommand("::barcode 2::");
+            oneOf(interpretCommand).interpretCommand("::barcode 3::");
         }});
 
         consumeAndInterpretCommands(new StringReader(unlines(Arrays.asList(
@@ -99,12 +99,6 @@ public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
 
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
         normalize(consumeTextAsLines(reader)).forEach(interpretCommand::interpretCommand);
-    }
-
-    // CONTRACT: the command text is "normalized"
-    @Override
-    public void interpretCommand(String text) {
-        barcodeScannedListener.onBarcode(text);
     }
 
     private Stream<String> consumeTextAsLines(final Reader reader) {
