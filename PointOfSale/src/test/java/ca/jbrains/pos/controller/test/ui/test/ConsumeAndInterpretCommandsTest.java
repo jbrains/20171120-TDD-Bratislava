@@ -1,5 +1,6 @@
 package ca.jbrains.pos.controller.test.ui.test;
 
+import ca.jbrains.pos.ui.NormalizeStreamsOfText;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
@@ -108,11 +109,7 @@ public class ConsumeAndInterpretCommandsTest {
     }
 
     private Stream<String> normalize(final Stream<String> lines) {
-        return lines.map(
-                line -> line.trim()
-        ).filter(
-                line -> !line.isEmpty()
-        );
+        return NormalizeStreamsOfText.removeWhitespace(lines);
     }
 
     public interface BarcodeScannedListener {
