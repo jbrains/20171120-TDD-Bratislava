@@ -1,4 +1,4 @@
-package ca.jbrains.pos.controller.test.ui.test;
+package ca.jbrains.pos.ui.test;
 
 import ca.jbrains.pos.ui.NormalizeStreamsOfText;
 import org.jmock.Expectations;
