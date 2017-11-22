@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ConsumeAndInterpretCommandsTest {
+public class ConsumeAndInterpretCommandsTest implements InterpretCommand {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
+
     private final BarcodeScannedListener barcodeScannedListener = context.mock(BarcodeScannedListener.class);
+    private final InterpretCommand interpretCommand = this;
 
     private static String unlines(final List<CharSequence> linesOfText) {
         return String.join(System.lineSeparator(), linesOfText);
@@ -96,11 +98,12 @@ public class ConsumeAndInterpretCommandsTest {
     }
 
     private void consumeAndInterpretCommands(final Reader reader) throws IOException {
-        normalize(consumeTextAsLines(reader)).forEach(this::interpretCommand);
+        normalize(consumeTextAsLines(reader)).forEach(interpretCommand::interpretCommand);
     }
 
     // CONTRACT: the command text is "normalized"
-    private void interpretCommand(String text) {
+    @Override
+    public void interpretCommand(String text) {
         barcodeScannedListener.onBarcode(text);
     }
 
